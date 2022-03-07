@@ -23,8 +23,7 @@ public class CustomerManager {
 
     @PersistenceContext(unitName = "customerPU")
     private EntityManager em;
-    @Resource
-    private javax.transaction.UserTransaction utx;
+
 
     // Add business logic below. (Right-click in editor and choose
     // "Insert Code > Add Business Method")
@@ -39,9 +38,7 @@ public class CustomerManager {
 
     public void persist(Customer customer) {
         try {
-            utx.begin();
             em.persist(customer);
-            utx.commit();
         } catch (Exception e) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, "exception caught", e);
             throw new RuntimeException(e);
