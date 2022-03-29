@@ -5,49 +5,89 @@
 package fr.grin.tpcustomerapplicationandrianarisaona.managedbeans;
 
 import fr.grin.tpcustomerapplicationandrianarisaona.entities.Customer;
+import fr.grin.tpcustomerapplicationandrianarisaona.entities.DiscountCode;
 import fr.grin.tpcustomerapplicationandrianarisaona.session.CustomerManager;
+import fr.grin.tpcustomerapplicationandrianarisaona.session.DiscountCodeManager;
 import javax.inject.Named;
 import javax.faces.view.ViewScoped;
 import java.io.Serializable;
+import java.util.List;
 import javax.ejb.EJB;
+import javax.faces.component.UIComponent;
+import javax.faces.context.FacesContext;
+import javax.faces.convert.Converter;
+
 
 /**
- *
- * @author Andrianarisaona
+ * Backing bean pour la page CustomerDetails.xhtml.
  */
-@Named(value = "customerDetailsMBean")
+@Named
 @ViewScoped
 public class CustomerDetailsMBean implements Serializable {
+  private int idCustomer;
+  private Customer customer;
 
-    private int idCustomer;
-    private Customer customer;
+  @EJB
+  private CustomerManager customerManager;
+  
+  @EJB
+  private DiscountCodeManager discountCodeManager;
 
-    @EJB
-    private CustomerManager customerManager;
-    
-    public int getIdCustomer() {
-        return idCustomer;
-    }
+  public int getIdCustomer() {
+    return idCustomer;
+  }
+/**
+ * 
+ * @param idCustomer 
+ */
+  public void setIdCustomer(int idCustomer) {
+    this.idCustomer = idCustomer;
+  }
 
-    public void setIdCustomer(int idCustomer) {
-        this.idCustomer = idCustomer;
-    }
-    
+  /**
+   * Retourne les détails du client courant (celui dans l'attribut customer de
+   * cette classe), qu'on appelle une propriété (property)
+     * @return 
+   */
     public Customer getDetails() {
       return customer;
     }
-    public String update() {
-    // Modifie la base de données.
-    // Il faut affecter à customer.
+
+  /**
+   * Action handler - met à jour dans la base de données les données du client
+   * contenu dans la variable d'instance customer.
+   * @return la prochaine page à afficher, celle qui affiche la liste des clients.
+   */
+  public String update() {
     customer = customerManager.update(customer);
     return "CustomerList";
   }
-    /**
-     * Creates a new instance of CustomerDetailsMBean
-     */
-    public CustomerDetailsMBean() {
+
+  public void loadCustomer() {
+    this.customer = customerManager.getCustomer(idCustomer);
+  }
+  
+  /**
+   * Retourne la liste de tous les DiscountCode.
+     * @return 
+   */
+  public List<DiscountCode> getDiscountCodes() {
+    return discountCodeManager.getAllDiscountCodes();
+  }
+  
+  public Converter<DiscountCode> getDiscountCodeConverter() {
+        return new Converter<DiscountCode>() {
+            
+            @Override
+            public DiscountCode getAsObject(FacesContext context, UIComponent component, String value) {
+                    return discountCodeManager.findById(value);
+            }
+            
+            @Override
+            public String getAsString(FacesContext context, UIComponent component, DiscountCode value) {
+                return value.getDiscountCode();
+            }
+        };
     }
-    public void loadCustomer(){
-        this.customer = customerManager.getCustomer(idCustomer);
-    }
+  
 }
